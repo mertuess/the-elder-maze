@@ -1,9 +1,14 @@
+#include "include/Maze.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <libtcod.hpp>
+#include <libtcod/console.h>
 
 int main(int argc, char *argv[]) {
-  auto console = tcod::Console{100, 50}; // Main console.
+  TEM::Maze maze(16, 16);
+  maze.Generate();
+
+  auto console = tcod::Console{200, 100}; // Main console.
 
   auto params = TCOD_ContextParams{};
   params.console =
@@ -14,17 +19,16 @@ int main(int argc, char *argv[]) {
   params.argc = argc; // This allows some user-control of the context.
   params.argv = argv;
 
-  // Set up a font
-  auto tileset =
-      tcod::load_tilesheet("./resources/fonts/terminal16x16_gs_ro.png",
-                           {16, 16}, tcod::CHARMAP_CP437);
-  params.tileset = tileset.get();
-
   auto context = tcod::Context(params);
 
   while (1) {
     console.clear();
-    tcod::print(console, {0, 0}, "Hello World", std::nullopt, std::nullopt);
+    for (int h = 0; h < maze.GetH(); h++) {
+      for (int w = 0; w < maze.GetW(); w++) {
+        console.at({w, h}).ch = maze.View[h * maze.GetW() + w];
+      }
+    }
+
     context.present(console); // Updates the visible display.
 
     SDL_Event event;

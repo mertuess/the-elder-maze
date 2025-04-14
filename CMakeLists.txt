@@ -21,5 +21,11 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/resources/
     COMMENT "Copying resources/ to build directory..."
 )
-
+add_custom_command(
+    TARGET TEM POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/terminal.png
+        ${CMAKE_BINARY_DIR}/terminal.png
+    COMMENT "Copying terminal.png to build directory..."
+)
 target_link_libraries(TEM PRIVATE fmt::fmt PRIVATE libtcod::libtcod)
