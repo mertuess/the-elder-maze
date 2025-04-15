@@ -1,7 +1,6 @@
 #include "../include/Maze.h"
 
-#include <chrono>
-#include <fmt/core.h>
+#include "../include/Logger.h"
 #include <random>
 #include <stdexcept>
 
@@ -30,14 +29,13 @@ short Maze::GetW() const { return real_w; }
 short Maze::GetH() const { return real_h; }
 
 void Maze::Generate() {
-  fmt::print("Start maze generation...\n");
+  Logger::Print("Start maze generation\n");
   carve({0, 0});
   convert();
 }
 
 // Private methods
 void Maze::carve(Point2D position) {
-  fmt::print("Carve cell: [{0}, {1}]\n", position.X, position.Y);
   try {
     maze[position.Y][position.X].Visited = true;
     maze[position.Y][position.X].Opened = false;
@@ -69,18 +67,17 @@ void Maze::carve(Point2D position) {
         }
         EndPoint.X = nx * 2 + 1;
         EndPoint.Y = ny * 2 + 1;
-        fmt::print("Successful!\n");
         carve({nx, ny});
       }
     }
   } catch (const std::exception &ex) {
-    fmt::print("Exception catched: {0}!\n", ex.what());
+    Logger::Print("Exception catched: {0}!\n", ex.what());
   }
 }
 
 void Maze::convert() {
-  fmt::print("Final End point is: [ {0}, {1} ]\n", EndPoint.X, EndPoint.Y);
-  fmt::print("Convert maze to array...");
+  Logger::Print("Final End point is: [ {0}, {1} ]\n", EndPoint.X, EndPoint.Y);
+  Logger::Print("Convert maze to array...\n");
   try {
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
@@ -92,9 +89,9 @@ void Maze::convert() {
       }
     }
     View[EndPoint.Y * real_w + EndPoint.X] = 'E';
-    fmt::print("Converted!\n");
+    Logger::Print("Converted!\n");
   } catch (const std::exception &ex) {
-    fmt::print("Exception catched: {0}!\n", ex.what());
+    Logger::Print("Exception catched: {0}!\n", ex.what());
   }
 }
 } // namespace TEM

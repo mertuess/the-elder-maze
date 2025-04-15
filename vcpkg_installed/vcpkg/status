@@ -111,3 +111,30 @@ Multi-Arch: same
 Description: Support for REXPaint files and TCODZip archives.
 Status: install ok installed
 
+Package: vcpkg-cmake-get-vars
+Version: 2024-09-22
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 1acdbfd8bc6086ec85dbd4b057fe143e3ac09e8fa34a2a9a7ca94d1b8ece6285
+Status: install ok installed
+
+Package: vcpkg-tool-meson
+Version: 1.7.2
+Depends: vcpkg-cmake-get-vars
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 6fd13e7758de0ce07ff7740ebc24d3c95fefa6828530441b9ee446ab701bef4c
+Description: Meson build system
+Status: install ok installed
+
+Package: tomlplusplus
+Version: 3.4.0
+Port-Version: 1
+Depends: vcpkg-cmake-config, vcpkg-tool-meson
+Architecture: x64-windows
+Multi-Arch: same
+Abi: c043b03c104fc6ee2791db35be1718bc6ec107c4c13f0b343109fcc791f9ce36
+Description: Header-only TOML config file parser and serializer for modern C++.
+Status: install ok installed
+

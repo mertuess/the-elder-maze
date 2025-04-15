@@ -1,0 +1,7 @@
+[window]
+width = 200
+height = 100
+
+[maze]
+width = 16
+height = 16
