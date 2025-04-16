@@ -15,7 +15,6 @@ int main(int argc, char *argv[]) {
 
     TEM::Maze maze(config["maze"]["width"].value_or(8),
                    config["maze"]["height"].value_or(8));
-    maze.Generate();
 
     TEM::Player player({1.5, 1.5}, 0, 100, 1, {});
 

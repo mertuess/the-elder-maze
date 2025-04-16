@@ -1,8 +1,8 @@
 #include "../include/Graphics.h"
 
 namespace TEM {
-char Graphics::_wallShadeSymb[4] = {'@', '%', '+', '='};
-char Graphics::GetWallShade(double depth, double distanceToWall) {
+int Graphics::_wallShadeSymb[4] = {219, 178, 177, 176};
+int Graphics::GetWallShade(double depth, double distanceToWall) {
   if (distanceToWall <= depth / 10.0) {
     return _wallShadeSymb[0];
   } else if (distanceToWall < depth / 8.0) {
@@ -14,4 +14,5 @@ char Graphics::GetWallShade(double depth, double distanceToWall) {
   }
   return ' ';
 }
+int *Graphics::GetWallShadeArr() { return _wallShadeSymb; }
 } // namespace TEM

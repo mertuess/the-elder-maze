@@ -4,11 +4,12 @@
 namespace TEM {
 class Graphics {
 private:
-  static char _wallShadeSymb[4];
+  static int _wallShadeSymb[4];
   Graphics() {}
 
 public:
-  static char GetWallShade(double depth, double distanceToWall);
+  static int GetWallShade(double depth, double distanceToWall);
+  static int *GetWallShadeArr();
 };
 } // namespace TEM
 

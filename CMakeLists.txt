@@ -14,7 +14,18 @@ include_directories(include)
 file(GLOB SRC_FILES "src/*.cpp")
 list(APPEND SRC_FILES "main.cpp")
 
-add_executable(TEM ${SRC_FILES})
+if (WIN32)
+    set(RESOURCE_FILES ${RESOURCE_FILES} "icon.rc")
+endif()
+
+add_executable(TEM ${SRC_FILES} ${RESOURCE_FILES})
+
+if (WIN32)
+    set_target_properties(TEM PROPERTIES
+        LINK_FLAGS "-mwindows"
+        RC_FLAGS "-i icon.ico"
+    )
+endif()
 
 add_custom_command(
   TARGET TEM POST_BUILD

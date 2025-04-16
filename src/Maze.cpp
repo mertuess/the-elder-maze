@@ -13,15 +13,6 @@ Maze::Maze(short width, short height)
     throw std::invalid_argument(
         "Wrong sizes of map! Width and height can't be less then 0");
   }
-
-  maze.resize(height, std::vector<MazeCell>(width));
-  View.resize(real_w * real_h, '.');
-  for (int h = 1; h <= real_h; h++) {
-    View[real_w * h - 1] = '#';
-  }
-  for (int w = 0; w < real_w; w++) {
-    View[real_h * real_w - real_w + w] = '#';
-  }
 }
 
 std::vector<std::vector<MazeCell>> Maze::GetMaze() const { return maze; }
@@ -30,8 +21,23 @@ short Maze::GetH() const { return real_h; }
 
 void Maze::Generate() {
   Logger::Print("Start maze generation\n");
+  maze = {};
+  View = "";
+  Logger::Print("Variables cleared\n");
+  maze.resize(height, std::vector<MazeCell>(width));
+  View.resize(real_w * real_h, '.');
+  Logger::Print("Resizing redistribution: successful\n");
+  for (int h = 1; h <= real_h; h++) {
+    View[real_w * h - 1] = '#';
+  }
+  for (int w = 0; w < real_w; w++) {
+    View[real_h * real_w - real_w + w] = '#';
+  }
+  Logger::Print("Launching pathfinding algorithm\n");
   carve({0, 0});
+  Logger::Print("Converting matrix into a simplest array\n");
   convert();
+  Logger::Print("The maze has been successfully generated\n");
 }
 
 // Private methods

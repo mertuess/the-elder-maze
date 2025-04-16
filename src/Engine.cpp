@@ -55,13 +55,13 @@ void Engine::Render() {
     int selected = mmenu.Update(mouseX, mouseY, mouseClick);
     if (selected >= 0) {
       switch (selected) {
-      case 0: // New Game
+      case 0:
         next_event = Event::NewGame;
         break;
-      case 1: // Load Game
+      case 1:
         next_event = Event::LoadGame;
         break;
-      case 2: // Exit
+      case 2:
         next_event = Event::Quit;
         break;
       }
@@ -118,31 +118,30 @@ void Engine::NewGame() {
 }
 
 void Engine::HandleKeydownEvent(const SDL_Event &event) {
-  TEM::Logger::Print("Pressed key: {}\n", event.key.key);
   switch (event.key.key) {
   case SDLK_UP:
-    next_event = Event::MoveUp;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveUp;
     break;
   case SDLK_DOWN:
-    next_event = Event::MoveDown;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveDown;
     break;
   case SDLK_LEFT:
-    next_event = Event::MoveLeft;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveLeft;
     break;
   case SDLK_RIGHT:
-    next_event = Event::MoveRight;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveRight;
     break;
   case SDLK_W:
-    next_event = Event::MoveUp;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveUp;
     break;
   case SDLK_S:
-    next_event = Event::MoveDown;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveDown;
     break;
   case SDLK_A:
-    next_event = Event::MoveLeft;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveLeft;
     break;
   case SDLK_D:
-    next_event = Event::MoveRight;
+    next_event = mmenu.IsActive ? Event::None : Event::MoveRight;
     break;
   case SDLK_ESCAPE:
     next_event = Event::ExitToMenu;
