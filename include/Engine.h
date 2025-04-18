@@ -2,7 +2,6 @@
 #define ENGINE_H
 
 #include "Interface.h"
-#include "Logger.h"
 #include "MainMenu.h"
 #include "Maze.h"
 #include "Player.h"

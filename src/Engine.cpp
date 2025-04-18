@@ -1,11 +1,13 @@
 #include "../include/Engine.h"
 #include "Renderer3D.h"
+#include <SDL3/SDL_hints.h>
+#include <SDL3/SDL_render.h>
 
 namespace TEM {
 Engine::Engine(EngineConfig conf, Maze &maze, Player &player, Interface &ui,
                Renderer3D &renderer, MainMenu &mmenu)
     : conf(conf), ui(ui), maze(maze), player(player), _running(true),
-      renderer(renderer), mmenu(mmenu) {
+      renderer(renderer), mmenu(mmenu), mouseX(0), mouseY(0) {
   console = tcod::Console{conf.windowWidth, conf.windowHeight};
 
   auto params = TCOD_ContextParams{};
@@ -13,7 +15,6 @@ Engine::Engine(EngineConfig conf, Maze &maze, Player &player, Interface &ui,
   params.window_title = "The Elder Maze";
   params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
   params.vsync = true;
-
   context = tcod::Context(params);
 }
 
@@ -29,14 +30,16 @@ void Engine::Input() {
   case SDL_EVENT_KEY_DOWN:
     HandleKeydownEvent(event);
     break;
-  case SDL_EVENT_MOUSE_MOTION:
-    mouseX = event.motion.x / 8;
-    mouseY = event.motion.y / 8;
+  case SDL_EVENT_MOUSE_MOTION: {
+    std::array<int, 2> mouse_cord = {static_cast<int>(event.motion.x),
+                                     static_cast<int>(event.motion.y)};
+    std::array<int, 2> coord = context.pixel_to_tile_coordinates(mouse_cord);
+    mouseX = coord[0];
+    mouseY = coord[1];
     break;
+  }
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
     if (event.button.button == SDL_BUTTON_LEFT) {
-      mouseX = event.button.x / 8;
-      mouseY = event.button.y / 8;
       mouseClick = true;
     }
     break;

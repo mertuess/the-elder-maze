@@ -8,6 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
+find_package(tomlplusplus CONFIG REQUIRED)
 
 include_directories(include)
 
@@ -34,6 +35,7 @@ add_custom_command(
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources/
     COMMENT "Copying resources/ to build directory..."
 )
+
 add_custom_command(
     TARGET TEM POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -41,6 +43,7 @@ add_custom_command(
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/terminal.png
     COMMENT "Copying terminal.png to build directory..."
 )
+
 add_custom_command(
     TARGET TEM POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -48,4 +51,5 @@ add_custom_command(
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config.toml
     COMMENT "Copying config.toml to build directory..."
 )
-target_link_libraries(TEM PRIVATE fmt::fmt PRIVATE libtcod::libtcod)
+
+target_link_libraries(TEM PRIVATE fmt::fmt PRIVATE libtcod::libtcod PRIVATE tomlplusplus::tomlplusplus)
