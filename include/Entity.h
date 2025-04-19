@@ -1,18 +1,19 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "Structs.h"
-#include <vector>
 
 namespace TEM {
 class Entity {
 private:
 public:
-  Entity(Vector2D position, double rotation,
-         std::vector<std::pair<unsigned short, unsigned short>> inventory);
-  Vector2D Position;
-  double Rotation;
-  std::vector<std::pair<unsigned short, unsigned short>> Inventory;
+  Entity();
+  Entity(Entity_System System);
+  Entity_System System;
   Point2D ConvertPosition();
 };
 } // namespace TEM

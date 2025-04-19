@@ -1,6 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "Enums.h"
 #include "Interface.h"
 #include "MainMenu.h"
 #include "Maze.h"

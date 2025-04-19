@@ -1,4 +1,5 @@
 #include "../include/Engine.h"
+#include "Global.h"
 #include "Renderer3D.h"
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_render.h>
@@ -71,7 +72,9 @@ void Engine::Render() {
     }
   } else {
     renderer.RenderWalls(console, player, maze);
-    ui.OutMap(console, maze, player);
+    ui.DrawMap(console, maze, player);
+    ui.DrawPlayerInfo(console, player);
+    ui.DrawMessages(console);
   }
   context.present(console);
 }
@@ -89,6 +92,9 @@ void Engine::Update() {
     break;
   case Event::MoveRight:
     player.Rotate(-.025);
+    break;
+  case Event::Attack:
+    TEM::Global::SendMessage("Attack: {} damage", player.GetDamage());
     break;
   case Event::Quit:
     Quit();
@@ -113,11 +119,7 @@ bool Engine::IsRunning() const { return _running; }
 
 void Engine::NewGame() {
   maze.Generate();
-  player.Position = {1.5, 1.5};
-  player.level = 1;
-  player.exp = 0;
-  player.Inventory = {};
-  player.health = 100;
+  player.System.Position = {1.5, 1.5};
 }
 
 void Engine::HandleKeydownEvent(const SDL_Event &event) {
@@ -148,6 +150,9 @@ void Engine::HandleKeydownEvent(const SDL_Event &event) {
     break;
   case SDLK_ESCAPE:
     next_event = Event::ExitToMenu;
+    break;
+  case SDLK_SPACE:
+    next_event = Event::Attack;
     break;
   }
 }

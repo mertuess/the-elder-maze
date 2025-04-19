@@ -1,8 +1,6 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-#include "Enums.h"
-#include <string>
 namespace TEM {
 struct MazeCell {
   bool WLeft = true, WTop = true, Visited = false, Opened = false;
@@ -22,14 +20,24 @@ struct Ray {
   double DistanceToWall = 0;
   bool HitWall = false;
 };
-struct ItemInfo {
-  std::string name;
-  std::string description;
-  double hp_modificator;
-  unsigned short attack_modificator;
-  unsigned short armor_modificator;
-  EquipType equip_type;
+struct Entity_System {
+  Vector2D Position;
+  double Rotation;
 };
+struct Scalable {
+  unsigned int Level = 1;
+  unsigned long int Experience = 0;
+  unsigned long int Threshold = Level * 1000;
+  unsigned int MaxHP = 100 + (Level - 1) * 25;
+};
+struct Characteristics {
+  unsigned int Health = 100;
+  unsigned int DefaultDamage = 0;
+  unsigned int DefaultArmor = 0;
+  unsigned int Damage = 0;
+  unsigned int Armor = 0;
+};
+struct Equip {};
 } // namespace TEM
 
 #endif // !STRUCTS_H

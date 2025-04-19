@@ -1,10 +1,11 @@
 #include "../include/Entity.h"
+#include "Structs.h"
 
 namespace TEM {
-Entity::Entity(Vector2D position, double rotation,
-               std::vector<std::pair<unsigned short, unsigned short>> inventory)
-    : Inventory(inventory), Position(position), Rotation(rotation) {}
+Entity::Entity() : System({{.0, .0}, .0}) {}
+Entity::Entity(Entity_System System) : System(System) {}
 Point2D Entity::ConvertPosition() {
-  return {static_cast<int>(Position.X), static_cast<int>(Position.Y)};
+  return {static_cast<int>(System.Position.X),
+          static_cast<int>(System.Position.Y)};
 }
 } // namespace TEM

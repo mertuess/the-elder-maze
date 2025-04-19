@@ -16,9 +16,9 @@ int main(int argc, char *argv[]) {
     TEM::Maze maze(config["maze"]["width"].value_or(8),
                    config["maze"]["height"].value_or(8));
 
-    TEM::Player player({1.5, 1.5}, 0, 100, 1, {});
+    TEM::Player player(TEM::Creature(TEM::Entity({{1.5, 1.5}, .0})));
 
-    TEM::Interface ui({5, 5});
+    TEM::Interface ui({5, 5, 20});
     TEM::MainMenu menu;
     TEM::Renderer3D renderer;
     TEM::Engine engine({config["window"]["width"].value_or(50),
