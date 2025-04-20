@@ -1,25 +1,27 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "Audio.h"
 #include "Enums.h"
 #include "Interface.h"
 #include "MainMenu.h"
 #include "Maze.h"
 #include "Player.h"
 #include "Renderer3D.h"
-#include <SDL3/SDL.h>
 #include <libtcod.hpp>
 #include <libtcod/console.h>
 
 namespace TEM {
 struct EngineConfig {
   int windowWidth, windowHeight;
+  double sensitivity;
 };
 class Engine {
 private:
   EngineConfig conf;
   tcod::Console console;
   tcod::Context context;
+  SDL_Window *sdl_window;
   std::vector<Entity> entities;
 
   Maze &maze;
@@ -32,9 +34,11 @@ private:
   bool _running;
 
   int mouseX, mouseY;
+  float mouse_delta_x, mouse_delta_y;
   bool mouseClick;
 
-  void HandleKeydownEvent(const SDL_Event &event);
+  void HandleKeyboard(const bool *keystate);
+  void HandleMouse(SDL_MouseButtonFlags flags, float x, float y);
   void Quit();
   void NewGame();
 

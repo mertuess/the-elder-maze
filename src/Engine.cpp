@@ -1,8 +1,10 @@
 #include "../include/Engine.h"
 #include "Global.h"
+#include "Logger.h"
 #include "Renderer3D.h"
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_hints.h>
+#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
 
 namespace TEM {
@@ -18,39 +20,28 @@ Engine::Engine(EngineConfig conf, Maze &maze, Player &player, Interface &ui,
   params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
   params.vsync = true;
   context = tcod::Context(params);
+  sdl_window = context.get_sdl_window();
+  Audio::Init();
+  Audio::Play((char *)"menu");
 }
 
 void Engine::Input() {
-  SDL_Event event{};
+  SDL_Event event;
 
-  SDL_WaitEvent(&event);
+  float mx, my;
+  SDL_MouseButtonFlags f = SDL_GetMouseState(&mx, &my);
+  const bool *keystate = SDL_GetKeyboardState(NULL);
+  HandleKeyboard(keystate);
+  HandleMouse(f, mx, my);
 
-  switch (event.type) {
-  case SDL_EVENT_QUIT:
-    next_event = Event::Quit;
-    break;
-  case SDL_EVENT_KEY_DOWN:
-    HandleKeydownEvent(event);
-    break;
-  case SDL_EVENT_MOUSE_MOTION: {
-    std::array<int, 2> mouse_cord = {static_cast<int>(event.motion.x),
-                                     static_cast<int>(event.motion.y)};
-    std::array<int, 2> coord = context.pixel_to_tile_coordinates(mouse_cord);
-    mouseX = coord[0];
-    mouseY = coord[1];
-    break;
-  }
-  case SDL_EVENT_MOUSE_BUTTON_DOWN:
-    if (event.button.button == SDL_BUTTON_LEFT) {
-      mouseClick = true;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_EVENT_QUIT:
+      Quit();
+    default:
+      break;
     }
-    break;
-  default:
-    next_event = Event::None;
-    break;
   }
-
-  SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
 }
 
 void Engine::Render() {
@@ -73,6 +64,8 @@ void Engine::Render() {
     }
   } else {
     renderer.RenderWalls(console, player, maze);
+    ui.weapon_delta = static_cast<int>(abs(player.weapon_delta));
+    ui.DrawWeapon(console);
     ui.DrawMap(console, maze, player);
     ui.DrawPlayerInfo(console, player);
     ui.DrawMessages(console);
@@ -81,33 +74,24 @@ void Engine::Render() {
 }
 
 void Engine::Update() {
+  player.UpdateAttack();
+  player.UpdateStepTimer(0.1);
   switch (next_event) {
-  case Event::MoveUp:
-    player.Move(maze, .1);
-    break;
-  case Event::MoveDown:
-    player.Move(maze, -.05);
-    break;
-  case Event::MoveLeft:
-    player.Rotate(.025);
-    break;
-  case Event::MoveRight:
-    player.Rotate(-.025);
-    break;
-  case Event::Attack:
-    TEM::Global::SendMessage("Attack: {} damage", player.GetDamage());
-    break;
   case Event::Quit:
     Quit();
     break;
   case Event::ExitToMenu:
+    Audio::Play((char *)"menu");
     mouseClick = false;
     mmenu.IsActive = true;
+    next_event = Event::None;
     break;
   case Event::NewGame:
+    Audio::Play((char *)"ambient");
     mouseClick = false;
     NewGame();
     mmenu.IsActive = false;
+    next_event = Event::None;
     break;
   case Event::LoadGame:
     break;
@@ -123,38 +107,58 @@ void Engine::NewGame() {
   player.System.Position = {1.5, 1.5};
 }
 
-void Engine::HandleKeydownEvent(const SDL_Event &event) {
-  switch (event.key.key) {
-  case SDLK_UP:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveUp;
-    break;
-  case SDLK_DOWN:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveDown;
-    break;
-  case SDLK_LEFT:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveLeft;
-    break;
-  case SDLK_RIGHT:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveRight;
-    break;
-  case SDLK_W:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveUp;
-    break;
-  case SDLK_S:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveDown;
-    break;
-  case SDLK_A:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveLeft;
-    break;
-  case SDLK_D:
-    next_event = mmenu.IsActive ? Event::None : Event::MoveRight;
-    break;
-  case SDLK_ESCAPE:
+void Engine::HandleKeyboard(const bool *keystate) {
+  if (keystate[SDL_SCANCODE_UP] ||
+      keystate[SDL_SCANCODE_W] && !mmenu.IsActive) {
+    if (player.CanStep())
+      Audio::PlayOneShot((char *)"step");
+    player.Move(maze, .025, 0.0);
+  }
+  if (keystate[SDL_SCANCODE_DOWN] ||
+      keystate[SDL_SCANCODE_S] && !mmenu.IsActive) {
+    if (player.CanStep())
+      Audio::PlayOneShot((char *)"step");
+    player.Move(maze, -.0125, 0.0);
+  }
+  if (keystate[SDL_SCANCODE_LEFT] ||
+      keystate[SDL_SCANCODE_A] && !mmenu.IsActive) {
+    if (player.CanStep())
+      Audio::PlayOneShot((char *)"step");
+    player.Move(maze, 0.0, .025);
+  }
+  if (keystate[SDL_SCANCODE_RIGHT] ||
+      keystate[SDL_SCANCODE_D] && !mmenu.IsActive) {
+    if (player.CanStep())
+      Audio::PlayOneShot((char *)"step");
+    player.Move(maze, 0.0, -.025);
+  }
+  if (keystate[SDL_SCANCODE_ESCAPE] && !mmenu.IsActive) {
     next_event = Event::ExitToMenu;
-    break;
-  case SDLK_SPACE:
-    next_event = Event::Attack;
-    break;
+  }
+  if (keystate[SDL_SCANCODE_SPACE] || mouseClick && !mmenu.IsActive) {
+    if (player.Attack() != -1)
+      player.weapon_delta = -75;
+    mouseClick = false;
+  }
+}
+
+void Engine::HandleMouse(SDL_MouseButtonFlags flags, float x, float y) {
+  SDL_ShowCursor();
+  int _w, _h;
+  SDL_GetWindowSize(sdl_window, &_w, &_h);
+  std::array<int, 2> mouse_cord = {static_cast<int>(x), static_cast<int>(y)};
+  mouse_delta_x = (int)(_w / 2) - x;
+  mouse_delta_y = (int)(_h / 2) - y;
+  if (!mmenu.IsActive) {
+    SDL_HideCursor();
+    SDL_WarpMouseInWindow(sdl_window, (int)(_w / 2), (int)(_h / 2));
+    player.Rotate(mouse_delta_x * conf.sensitivity / 1500.0);
+  }
+  std::array<int, 2> coord = context.pixel_to_tile_coordinates(mouse_cord);
+  mouseX = coord[0];
+  mouseY = coord[1];
+  if (flags == 1) {
+    mouseClick = true;
   }
 }
 

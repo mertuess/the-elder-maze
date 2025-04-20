@@ -1,4 +1,5 @@
 #include "../include/MainMenu.h"
+#include "Audio.h"
 #include "Logger.h"
 #include <fstream>
 #include <libtcod/console_drawing.h>
@@ -47,6 +48,7 @@ bool MainMenu::IsInMenu(Point2D position) {
 
 int MainMenu::Update(int mouseX, int mouseY, bool mouseClick) {
   if (mouseClick && IsInMenu({mouseX, mouseY})) {
+    TEM::Audio::PlayOneShot((char *)"press");
     return items[selectedItem].id;
   }
 
@@ -54,6 +56,8 @@ int MainMenu::Update(int mouseX, int mouseY, bool mouseClick) {
     for (size_t i = 0; i < items.size(); ++i) {
       if (mouseX >= items[i].x && mouseX < items[i].x + items[i].size.X &&
           mouseY >= items[i].y && mouseY < items[i].y + items[i].size.Y) {
+        if (selectedItem != i)
+          TEM::Audio::PlayOneShot((char *)"enter");
         selectedItem = i;
         break;
       }

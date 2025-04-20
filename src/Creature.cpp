@@ -1,4 +1,5 @@
 #include "Creature.h"
+#include "Audio.h"
 #include "Constants.h"
 #include "Entity.h"
 #include "Global.h"
@@ -7,26 +8,36 @@
 #include <random>
 
 namespace TEM {
-Creature::Creature() : Entity() { recalculate_characteristics(); }
-Creature::Creature(Entity entity) : Entity(entity) {
+Creature::Creature(std::string name) : Entity(), name(name) {
   recalculate_characteristics();
 }
-Creature::Creature(Entity entity, unsigned int StartLevel, struct Equip Equip)
+Creature::Creature(Entity entity, std::string name)
+    : Entity(entity), name(name) {
+  recalculate_characteristics();
+}
+Creature::Creature(Entity entity, std::string name, unsigned int StartLevel,
+                   struct Equip Equip)
     : Entity(entity), scalable({StartLevel, 0, 0}), Equip(Equip),
-      characteristics({100, 0, 0, 0, 0}) {
+      characteristics({100, 0, 0, 0, 0, 1.0}), name(name) {
   recalculate_characteristics();
 }
 
-void Creature::Move(Maze &maze, double speed) {
+void Creature::Move(Maze &maze, double speedX, double speedY) {
   if (!IsAlive)
     return;
-  System.Position.X += sin(System.Rotation) * speed;
-  System.Position.Y += cos(System.Rotation) * speed;
+  System.Position.X += sin(System.Rotation) * speedX;
+  System.Position.Y += cos(System.Rotation) * speedX;
+  System.Position.X += cos(-System.Rotation) * speedY;
+  System.Position.Y += sin(-System.Rotation) * speedY;
+  TEM::Logger::Print("Rotation: {}\nCos: {} Sin: {}", System.Rotation,
+                     cos(System.Rotation), sin(System.Rotation));
   Point2D converted_pos = ConvertPosition();
 
   if (maze.View[converted_pos.Y * maze.GetW() + converted_pos.X] == '#') {
-    System.Position.X -= sin(System.Rotation) * speed;
-    System.Position.Y -= cos(System.Rotation) * speed;
+    System.Position.X -= sin(System.Rotation) * speedX;
+    System.Position.Y -= cos(System.Rotation) * speedX;
+    System.Position.X -= cos(-System.Rotation) * speedY;
+    System.Position.Y -= sin(-System.Rotation) * speedY;
   }
 }
 
@@ -52,6 +63,8 @@ void Creature::AddExp(unsigned int exp) {
 }
 
 void Creature::recalculate_characteristics() {
+  characteristics.AttackSpeed = 1.0 + scalable.Level * 0.1;
+  attack_treshold = 5.0 / characteristics.AttackSpeed;
   characteristics.DefaultDamage = 10 + scalable.Level * 3;
   characteristics.DefaultArmor = 4 + scalable.Level;
   characteristics.Damage = characteristics.DefaultDamage; // + Weapon
@@ -84,5 +97,30 @@ unsigned int Creature::GetDamage() const {
       characteristics.Damage - TEM::DAMAGE_DISPERSION,
       characteristics.Damage + TEM::DAMAGE_DISPERSION);
   return dist(e);
+}
+
+short Creature::Attack() {
+  if (attack_timer >= 0.1)
+    return -1;
+  attack_timer = attack_treshold;
+  std::random_device r;
+  std::default_random_engine e(r());
+  e.seed(std::chrono::system_clock::now().time_since_epoch().count());
+  std::uniform_int_distribution<int> dist(1, 12);
+  if (dist(e) < 4) {
+    Global::SendMessage("{} missed!", name);
+    TEM::Audio::PlayOneShot((char *)"miss");
+    return 0;
+  }
+  unsigned int _damage = GetDamage();
+  Global::SendMessage("{} hit <Ogre> for {} damage!", name, _damage);
+  TEM::Audio::PlayOneShot((char *)"attack");
+  return 1;
+}
+
+void Creature::UpdateAttack() {
+  if (attack_timer > 0) {
+    attack_timer -= 0.1;
+  }
 }
 } // namespace TEM

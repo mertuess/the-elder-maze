@@ -14,7 +14,7 @@ public:
   static std::vector<std::string> messages;
   template <typename... Args>
   static void SendMessage(fmt::string_view fmt, Args &&...args) {
-    if (messages.size() >= 20) {
+    if (messages.size() >= 11) {
       messages.erase(messages.begin());
     }
     messages.push_back(fmt::format(fmt, std::forward<Args>(args)...));

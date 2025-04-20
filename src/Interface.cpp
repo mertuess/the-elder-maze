@@ -11,7 +11,8 @@ namespace TEM {
 TEM::Interface::Interface(InterfaceConfig config)
     : MapPosition({config.minimap_position_x, config.minimap_position_y}),
       panel_size(config.panel_size) {
-  askiiLines.push_back(loadASCII("./resources/ascii/knight"));
+  asciiLines.push_back(loadASCII("./resources/ascii/sword"));
+  asciiLines.push_back(loadASCII("./resources/ascii/sword_2"));
 }
 
 void TEM::Interface::DrawMap(tcod::Console &console, Maze &map,
@@ -32,6 +33,11 @@ void TEM::Interface::DrawMap(tcod::Console &console, Maze &map,
       .ch = 2;
 }
 
+void TEM::Interface::DrawWeapon(tcod::Console &console) {
+  int x = console.get_width() - asciiLines[0][0].length() + weapon_delta - 75;
+  renderASCII(console, asciiLines[0], x, 0, TCOD_ColorRGB({255, 255, 255}));
+}
+
 void TEM::Interface::DrawPlayerInfo(tcod::Console &console, Player &player) {
   int _h = console.get_height();
   int _w = console.get_width();
@@ -48,13 +54,8 @@ void TEM::Interface::DrawPlayerInfo(tcod::Console &console, Player &player) {
   tcod::draw_frame(console, {1, _h - panel_size - 1, 50, panel_size}, {},
                    COLOR_DARK, COLOR_DARK);
 
-  // Player Avatar
-  drawSeparator(console, 51);
-  renderASCII(console, askiiLines[0], 52, _h - panel_size - 1,
-              TCOD_ColorRGB({255, 255, 255}));
-
   // Player Info
-  drawSeparator(console, 71);
+  drawSeparator(console, 51);
   auto s = player.GetScalable();
   auto c = player.GetCharacteristics();
   std::array<std::string, 5> info{
@@ -65,11 +66,11 @@ void TEM::Interface::DrawPlayerInfo(tcod::Console &console, Player &player) {
                   c.Damage + TEM::DAMAGE_DISPERSION),
       fmt::format("Armor: {}", c.Armor)};
 
-  for (int i = 0; i <= 20; i += 4) {
-    tcod::print(console, {73, console.get_height() - panel_size + i},
-                info[i / 4], TCOD_ColorRGB({255, 255, 255}), std::nullopt);
+  for (int i = 0; i <= 10; i += 2) {
+    tcod::print(console, {53, console.get_height() - panel_size + i},
+                info[i / 2], TCOD_ColorRGB({255, 255, 255}), std::nullopt);
   }
-  drawSeparator(console, 101);
+  drawSeparator(console, 81);
 }
 
 void TEM::Interface::DrawMessages(tcod::Console &console) {
@@ -104,8 +105,13 @@ void Interface::renderASCII(tcod::Console &console,
     return;
 
   for (size_t i = 0; i < lines.size(); ++i) {
-    tcod::print(console, {x, static_cast<int>(y + i)}, lines[i], color,
-                std::nullopt);
+    std::string line = lines[i];
+    for (size_t j = 0; j < line.size(); ++j) {
+      if (line[j] == ' ')
+        continue;
+      console.at(static_cast<int>(x + j), static_cast<int>(y + i)).fg = color;
+      console.at(static_cast<int>(x + j), static_cast<int>(y + i)).ch = line[j];
+    }
   }
 }
 

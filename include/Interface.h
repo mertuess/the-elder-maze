@@ -15,7 +15,7 @@ struct InterfaceConfig {
 class Interface {
 private:
   int panel_size;
-  std::vector<std::vector<std::string>> askiiLines;
+  std::vector<std::vector<std::string>> asciiLines;
   std::vector<std::string> loadASCII(const std::string &filePath);
   void renderASCII(tcod::Console &console, std::vector<std::string> lines,
                    int x, int y, TCOD_ColorRGB color);
@@ -27,9 +27,12 @@ private:
 public:
   Interface(InterfaceConfig config);
   Point2D MapPosition;
+  int weapon_delta;
+
   void DrawMap(tcod::Console &console, Maze &map, Player &player);
   void DrawPlayerInfo(tcod::Console &console, Player &player);
   void DrawMessages(tcod::Console &console);
+  void DrawWeapon(tcod::Console &console);
 };
 } // namespace TEM
 

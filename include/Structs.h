@@ -3,7 +3,6 @@
 
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 
 namespace TEM {
 struct MazeCell {
@@ -40,6 +39,7 @@ struct Characteristics {
   unsigned int DefaultArmor = 0;
   unsigned int Damage = 0;
   unsigned int Armor = 0;
+  double AttackSpeed = 1;
 };
 struct Equip {};
 struct AudioClip {
@@ -47,6 +47,7 @@ struct AudioClip {
   char *path;
   Uint8 *wav_data = NULL;
   Uint32 wav_data_len = 0;
+  SDL_AudioSpec spec;
 };
 } // namespace TEM
 
