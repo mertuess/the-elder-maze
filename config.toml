@@ -5,3 +5,7 @@ height = 100
 [maze]
 width = 16
 height = 16
+
+[audio]
+music_volume = 1.0
+sounds_volume = 1.0

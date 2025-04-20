@@ -1,6 +1,7 @@
 #include "../include/Engine.h"
 #include "Global.h"
 #include "Renderer3D.h"
+#include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_render.h>
 

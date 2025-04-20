@@ -1,6 +1,10 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+#define SDL_MAIN_USE_CALLBACKS 1
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+
 namespace TEM {
 struct MazeCell {
   bool WLeft = true, WTop = true, Visited = false, Opened = false;
@@ -38,6 +42,12 @@ struct Characteristics {
   unsigned int Armor = 0;
 };
 struct Equip {};
+struct AudioClip {
+  char *name;
+  char *path;
+  Uint8 *wav_data = NULL;
+  Uint32 wav_data_len = 0;
+};
 } // namespace TEM
 
 #endif // !STRUCTS_H
