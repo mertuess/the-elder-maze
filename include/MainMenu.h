@@ -36,7 +36,7 @@ public:
   MainMenu();
   void Render(tcod::Console &console);
   bool IsInMenu(Point2D position);
-  int Update(int mouseX, int mouseY, bool mouseClick);
+  int Update(int mouseX, int mouseY, SDL_MouseButtonFlags flags);
   bool IsActive;
 };
 } // namespace TEM

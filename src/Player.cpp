@@ -29,7 +29,5 @@ void Player::UpdateStepTimer(double speed) {
 
   if (weapon_delta < 75)
     weapon_delta += 10.0;
-
-  TEM::Logger::Print("Delta: {}\n", weapon_delta);
 }
 } // namespace TEM

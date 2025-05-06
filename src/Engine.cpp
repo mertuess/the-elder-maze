@@ -29,10 +29,10 @@ void Engine::Input() {
   SDL_Event event;
 
   float mx, my;
-  SDL_MouseButtonFlags f = SDL_GetMouseState(&mx, &my);
+  mouseFlags = SDL_GetMouseState(&mx, &my);
   const bool *keystate = SDL_GetKeyboardState(NULL);
   HandleKeyboard(keystate);
-  HandleMouse(f, mx, my);
+  HandleMouse(mouseFlags, mx, my);
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
@@ -48,7 +48,7 @@ void Engine::Render() {
   console.clear();
   if (mmenu.IsActive) {
     mmenu.Render(console);
-    int selected = mmenu.Update(mouseX, mouseY, mouseClick);
+    int selected = mmenu.Update(mouseX, mouseY, mouseFlags);
     if (selected >= 0) {
       switch (selected) {
       case 0:
@@ -82,13 +82,11 @@ void Engine::Update() {
     break;
   case Event::ExitToMenu:
     Audio::Play((char *)"menu");
-    mouseClick = false;
     mmenu.IsActive = true;
     next_event = Event::None;
     break;
   case Event::NewGame:
     Audio::Play((char *)"ambient");
-    mouseClick = false;
     NewGame();
     mmenu.IsActive = false;
     next_event = Event::None;
@@ -105,6 +103,7 @@ bool Engine::IsRunning() const { return _running; }
 void Engine::NewGame() {
   maze.Generate();
   player.System.Position = {1.5, 1.5};
+  Global::messages.clear();
 }
 
 void Engine::HandleKeyboard(const bool *keystate) {
@@ -135,10 +134,9 @@ void Engine::HandleKeyboard(const bool *keystate) {
   if (keystate[SDL_SCANCODE_ESCAPE] && !mmenu.IsActive) {
     next_event = Event::ExitToMenu;
   }
-  if (keystate[SDL_SCANCODE_SPACE] || mouseClick && !mmenu.IsActive) {
+  if (keystate[SDL_SCANCODE_SPACE] || mouseFlags == 1 && !mmenu.IsActive) {
     if (player.Attack() != -1)
       player.weapon_delta = -75;
-    mouseClick = false;
   }
 }
 
@@ -157,9 +155,6 @@ void Engine::HandleMouse(SDL_MouseButtonFlags flags, float x, float y) {
   std::array<int, 2> coord = context.pixel_to_tile_coordinates(mouse_cord);
   mouseX = coord[0];
   mouseY = coord[1];
-  if (flags == 1) {
-    mouseClick = true;
-  }
 }
 
 void Engine::Quit() { _running = false; }

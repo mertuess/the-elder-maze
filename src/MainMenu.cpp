@@ -46,8 +46,9 @@ bool MainMenu::IsInMenu(Point2D position) {
          position.Y >= menuY && position.Y < menuY + height;
 }
 
-int MainMenu::Update(int mouseX, int mouseY, bool mouseClick) {
-  if (mouseClick && IsInMenu({mouseX, mouseY})) {
+int MainMenu::Update(int mouseX, int mouseY, SDL_MouseButtonFlags flags) {
+  TEM::Logger::Print("Is in menu: {}\n", IsInMenu({mouseX, mouseY}));
+  if (flags == 1 && IsInMenu({mouseX, mouseY}) && selectedItem != -1) {
     TEM::Audio::PlayOneShot((char *)"press");
     return items[selectedItem].id;
   }
@@ -62,6 +63,8 @@ int MainMenu::Update(int mouseX, int mouseY, bool mouseClick) {
         break;
       }
     }
+  } else {
+    selectedItem = -1;
   }
 
   return -1;

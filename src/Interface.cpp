@@ -66,7 +66,7 @@ void TEM::Interface::DrawPlayerInfo(tcod::Console &console, Player &player) {
                   c.Damage + TEM::DAMAGE_DISPERSION),
       fmt::format("Armor: {}", c.Armor)};
 
-  for (int i = 0; i <= 10; i += 2) {
+  for (int i = 0; i < info.size() * 2; i += 2) {
     tcod::print(console, {53, console.get_height() - panel_size + i},
                 info[i / 2], TCOD_ColorRGB({255, 255, 255}), std::nullopt);
   }

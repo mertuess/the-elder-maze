@@ -35,7 +35,7 @@ private:
 
   int mouseX, mouseY;
   float mouse_delta_x, mouse_delta_y;
-  bool mouseClick;
+  SDL_MouseButtonFlags mouseFlags;
 
   void HandleKeyboard(const bool *keystate);
   void HandleMouse(SDL_MouseButtonFlags flags, float x, float y);

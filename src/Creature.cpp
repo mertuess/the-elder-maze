@@ -29,8 +29,6 @@ void Creature::Move(Maze &maze, double speedX, double speedY) {
   System.Position.Y += cos(System.Rotation) * speedX;
   System.Position.X += cos(-System.Rotation) * speedY;
   System.Position.Y += sin(-System.Rotation) * speedY;
-  TEM::Logger::Print("Rotation: {}\nCos: {} Sin: {}", System.Rotation,
-                     cos(System.Rotation), sin(System.Rotation));
   Point2D converted_pos = ConvertPosition();
 
   if (maze.View[converted_pos.Y * maze.GetW() + converted_pos.X] == '#') {
